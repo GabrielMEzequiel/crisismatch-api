@@ -19,6 +19,10 @@
       {
         "name": "Organizations",
         "description": "Operações relacionadas a instituições"
+      },
+      {
+        "name": "Actions",
+        "description": "Operações relacionadas a ações/vagas de voluntariado"
       }
     ],
     "paths": {
@@ -118,7 +122,6 @@
           }
         }
       },
-  
       "/api/organizations": {
         "get": {
           "tags": ["Organizations"],
@@ -214,9 +217,126 @@
             "500": { "$ref": "#/components/responses/InternalError" }
           }
         }
+      },
+      "/api/actions": {
+        "post": {
+          "tags": ["Actions"],
+          "summary": "Criar uma nova ação",
+          "operationId": "createAction",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CreateActionInput" }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Ação criada com sucesso",
+              "content": {
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/Action" }
+                }
+              }
+            },
+            "400": { "$ref": "#/components/responses/MissingQueryParam" },
+            "500": { "$ref": "#/components/responses/InternalError" }
+          }
+        }
+      },
+      "/api/actions/{id}": {
+        "get": {
+          "tags": ["Actions"],
+          "summary": "Obter detalhes de uma ação",
+          "operationId": "getActionById",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string", "format": "uuid" }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Ação encontrada",
+              "content": {
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/Action" }
+                }
+              }
+            },
+            "404": { "$ref": "#/components/responses/NotFound" },
+            "500": { "$ref": "#/components/responses/InternalError" }
+          }
+        },
+        "patch": {
+          "tags": ["Actions"],
+          "summary": "Atualizar uma ação existente",
+          "operationId": "updateAction",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string", "format": "uuid" }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UpdateActionInput" }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Ação atualizada com sucesso",
+              "content": {
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/Action" }
+                }
+              }
+            },
+            "400": { "description": "Nenhum campo válido fornecido" },
+            "404": { "$ref": "#/components/responses/NotFound" },
+            "500": { "$ref": "#/components/responses/InternalError" }
+          }
+        }
+      },
+      "/api/organizations/{organizationId}/actions": {
+        "get": {
+          "tags": ["Actions"],
+          "summary": "Listar ações de uma organização",
+          "operationId": "getActionsByOrganization",
+          "parameters": [
+            {
+              "name": "organizationId",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string", "format": "uuid" }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Lista de ações retornada",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": { "$ref": "#/components/schemas/Action" }
+                  }
+                }
+              }
+            },
+            "400": { "description": "organizationId é obrigatório" },
+            "500": { "$ref": "#/components/responses/InternalError" }
+          }
+        }
       }
     },
-  
     "components": {
       "schemas": {
         "Volunteer": {
@@ -237,7 +357,6 @@
             "created_at": { "type": "string", "format": "date-time" }
           }
         },
-  
         "Organization": {
           "type": "object",
           "properties": {
@@ -248,42 +367,48 @@
             "created_at": { "type": "string", "format": "date-time" }
           }
         },
-  
+        "Action": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string", "format": "uuid" },
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "organization_id": { "type": "string", "format": "uuid" },
+            "location": { "type": "string" },
+            "date": { "type": "string", "format": "date-time" },
+            "required_skills": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "interests": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "vacancies": { "type": "integer" },
+            "created_at": { "type": "string", "format": "date-time" }
+          }
+        },
         "CreateVolunteerInput": {
           "type": "object",
           "required": ["name", "email", "skills", "interests", "availability"],
           "properties": {
             "name": { "type": "string" },
             "email": { "type": "string", "format": "email" },
-            "skills": {
-              "type": "array",
-              "items": { "type": "string" }
-            },
-            "interests": {
-              "type": "array",
-              "items": { "type": "string" }
-            },
+            "skills": { "type": "array", "items": { "type": "string" } },
+            "interests": { "type": "array", "items": { "type": "string" } },
             "availability": { "type": "string" }
           }
         },
-  
         "UpdateVolunteerInput": {
           "type": "object",
           "properties": {
             "name": { "type": "string" },
             "email": { "type": "string", "format": "email" },
-            "skills": {
-              "type": "array",
-              "items": { "type": "string" }
-            },
-            "interests": {
-              "type": "array",
-              "items": { "type": "string" }
-            },
+            "skills": { "type": "array", "items": { "type": "string" } },
+            "interests": { "type": "array", "items": { "type": "string" } },
             "availability": { "type": "string" }
           }
         },
-  
         "CreateOrganizationInput": {
           "type": "object",
           "required": ["name", "email", "description"],
@@ -293,7 +418,6 @@
             "description": { "type": "string" }
           }
         },
-  
         "UpdateOrganizationInput": {
           "type": "object",
           "properties": {
@@ -302,7 +426,32 @@
             "description": { "type": "string" }
           }
         },
-  
+        "CreateActionInput": {
+          "type": "object",
+          "required": ["title", "description", "organization_id", "location", "date", "vacancies"],
+          "properties": {
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "organization_id": { "type": "string", "format": "uuid" },
+            "location": { "type": "string" },
+            "date": { "type": "string", "format": "date-time" },
+            "required_skills": { "type": "array", "items": { "type": "string" } },
+            "interests": { "type": "array", "items": { "type": "string" } },
+            "vacancies": { "type": "integer" }
+          }
+        },
+        "UpdateActionInput": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "location": { "type": "string" },
+            "date": { "type": "string", "format": "date-time" },
+            "required_skills": { "type": "array", "items": { "type": "string" } },
+            "interests": { "type": "array", "items": { "type": "string" } },
+            "vacancies": { "type": "integer" }
+          }
+        },
         "Error": {
           "type": "object",
           "properties": {
@@ -310,10 +459,9 @@
           }
         }
       },
-  
       "responses": {
         "MissingQueryParam": {
-          "description": "Parâmetros ausentes",
+          "description": "Parâmetros ausentes ou inválidos",
           "content": {
             "application/json": {
               "schema": { "$ref": "#/components/schemas/Error" }
@@ -321,7 +469,7 @@
           }
         },
         "NotFound": {
-          "description": "Não encontrado",
+          "description": "Recurso não encontrado",
           "content": {
             "application/json": {
               "schema": { "$ref": "#/components/schemas/Error" }
@@ -329,7 +477,7 @@
           }
         },
         "Conflict": {
-          "description": "Conflito",
+          "description": "Conflito de dados",
           "content": {
             "application/json": {
               "schema": { "$ref": "#/components/schemas/Error" }
@@ -337,7 +485,7 @@
           }
         },
         "UnprocessableEntity": {
-          "description": "Erro de validação",
+          "description": "Erro de validação de dados",
           "content": {
             "application/json": {
               "schema": { "$ref": "#/components/schemas/Error" }
@@ -345,7 +493,7 @@
           }
         },
         "InternalError": {
-          "description": "Erro interno",
+          "description": "Erro interno no servidor",
           "content": {
             "application/json": {
               "schema": { "$ref": "#/components/schemas/Error" }
