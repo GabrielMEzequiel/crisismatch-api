@@ -60,3 +60,28 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Internal server error" }, { status: 500 })
     }
 }
+
+// GET /api/actions — getAvailableActions
+export async function GET() {
+    try {
+        const cookieStore = await cookies()
+        const supabase = await createClient(cookieStore)
+
+        const now = new Date().toISOString()
+
+        const { data, error } = await supabase
+            .from("actions")
+            .select("*")
+            .gt("vacancies", 0)        // Tem que ter vagas
+            .gte("date", now)          // A data tem que ser maior ou igual a agora
+            .order("date", { ascending: true }) // Ordena pelas mais próximas
+
+        if (error) {
+            return NextResponse.json({ error: error.message }, { status: 500 })
+        }
+
+        return NextResponse.json(data, { status: 200 })
+    } catch {
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    }
+}
