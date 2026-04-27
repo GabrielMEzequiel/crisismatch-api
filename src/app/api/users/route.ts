@@ -1,38 +1,6 @@
+import { User } from "@/types/user"
 import { createClient } from "@/utils/supabase/server"
 import { cookies } from "next/headers"
-
-type UserType = "Voluntário" | "Instituição"
-
-interface User {
-    id: string
-    name: string
-    email: string
-    type: UserType
-}
-
-// 🔍 Buscar usuário por email
-export async function GET(req: Request) {
-    const cookieStore = await cookies()
-    const supabase = createClient(cookieStore)
-    const { searchParams } = new URL(req.url)
-    const email = searchParams.get("email")
-
-    if (!email) {
-        return Response.json({ error: "Email é obrigatório" }, { status: 400 })
-    }
-
-    const { data, error } = await supabase
-        .from("users")
-        .select("id, nome, email, type")
-        .eq("email", email)
-        .single()
-
-    if (error) {
-        return Response.json({ error: "Usuário não encontrado" }, { status: 404 })
-    }
-
-    return Response.json(data)
-}
 
 // ➕ Criar usuário
 export async function POST(req: Request) {
@@ -40,7 +8,7 @@ export async function POST(req: Request) {
     const supabase = createClient(cookieStore)
     const body: Partial<User> = await req.json()
 
-    const { name, email, type } = body
+    const { name, email, type, organization_type, description } = body
 
     if (!name || !email || !type) {
         return Response.json(
@@ -56,10 +24,26 @@ export async function POST(req: Request) {
         )
     }
 
+    if (type === "Instituição" && !organization_type) {
+        return Response.json(
+            { error: "organization_type é obrigatório para Instituições" },
+            { status: 400 }
+        )
+    }
+
     const { data, error } = await supabase
         .from("users")
-        .insert([{ name, email, type }])
-        .select("id, name, email, type")
+        .insert([{
+            name,
+            email,
+            type,
+            skills: [],
+            interests: [],
+            availability: null,
+            organization_type: type === "Instituição" ? organization_type : null,
+            description:       type === "Instituição" ? (description ?? null) : null,
+        }])
+        .select("id, name, email, type, skills, interests, availability, organization_type, description")
         .single()
 
     if (error) {
