@@ -4,11 +4,11 @@ import { cookies } from "next/headers"
 // 👤 GET /api/users/abc-123
 export async function GET(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     const cookieStore = await cookies()
     const supabase = createClient(cookieStore)
-    const { id } = params
+    const { id } = await params
 
     const { data, error } = await supabase
         .from("users")

@@ -4,11 +4,11 @@ import { cookies } from "next/headers"
 // ✏️ PATCH /api/users/abc-123/profile
 export async function PATCH(
     req: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     const cookieStore = await cookies()
     const supabase = createClient(cookieStore)
-    const { id } = params
+    const { id } = await params
     const body = await req.json()
 
     const { name, skills, interests, availability, organization_type, description } = body
