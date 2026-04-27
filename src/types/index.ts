@@ -28,10 +28,23 @@ export type Action = {
     vacancies: number
     created_at?: string
 }
+
+export type Enrollment = {
+    id: string
+    volunteer_id: string
+    action_id: string
+    status: "confirmed" | "cancelled"
+    created_at?: string
+}
   
 export type CreateVolunteerInput = Omit<Volunteer, "id" | "created_at">
 export type CreateOrganizationInput = Omit<Organization, "id" | "created_at">
 export type CreateActionInput = Omit<Action, "id" | "created_at">
+
+export type CreateEnrollmentInput = {
+    volunteer_id: string
+    action_id: string
+}
 
 export type UpdateVolunteerInput = {
     name?: string
@@ -55,4 +68,8 @@ export type UpdateActionInput = {
     required_skills?: string[]
     interests?: string[]
     vacancies?: number
+}
+
+export type UpdateEnrollmentInput = {
+    status?: "confirmed" | "cancelled"
 }

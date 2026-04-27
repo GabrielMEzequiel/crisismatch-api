@@ -66,21 +66,28 @@ export async function GET() {
     try {
         const cookieStore = await cookies()
         const supabase = await createClient(cookieStore)
-
         const now = new Date().toISOString()
 
+        // Buscamos as ações e fazemos um "count" das inscrições confirmadas
         const { data, error } = await supabase
             .from("actions")
-            .select("*")
-            .gt("vacancies", 0)        // Tem que ter vagas
-            .gte("date", now)          // A data tem que ser maior ou igual a agora
-            .order("date", { ascending: true }) // Ordena pelas mais próximas
+            .select(`
+                *,
+                enrollments(count)
+            `)
+            .eq("enrollments.status", "confirmed") // Apenas as preenchidas
+            .gte("date", now)
+            .order("date", { ascending: true })
 
-        if (error) {
-            return NextResponse.json({ error: error.message }, { status: 500 })
-        }
+        if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-        return NextResponse.json(data, { status: 200 })
+        // Filtramos: vagas totais > vagas ocupadas
+        const availableActions = data.filter(action => {
+            const confirmedCount = action.enrollments?.[0]?.count ?? 0
+            return action.vacancies > confirmedCount
+        })
+
+        return NextResponse.json(availableActions, { status: 200 })
     } catch {
         return NextResponse.json({ error: "Internal server error" }, { status: 500 })
     }
