@@ -24,13 +24,6 @@ export async function POST(req: Request) {
         )
     }
 
-    if (type === "Instituição" && !organization_type) {
-        return Response.json(
-            { error: "organization_type é obrigatório para Instituições" },
-            { status: 400 }
-        )
-    }
-
     const { data, error } = await supabase
         .from("users")
         .insert([{
