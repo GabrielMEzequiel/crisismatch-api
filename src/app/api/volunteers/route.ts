@@ -1,30 +1,30 @@
 import { createClient } from "@/utils/supabase/server"
+import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { CreateVolunteerInput } from "@/types"
-import { cookies } from "next/headers"
 
 const TABLE = "volunteers"
 
-// GET /api/volunteers?email=...  or  /api/volunteers?id=...
+// GET /api/volunteers?email=...
 export async function GET(request: NextRequest) {
   const cookieStore = await cookies()
   const supabase = await createClient(cookieStore)
   const { searchParams } = new URL(request.url)
 
   const email = searchParams.get("email")
-  const id = searchParams.get("id")
 
-  if (!email && !id) {
+  if (!email) {
     return NextResponse.json(
-      { error: "Provide either 'email' or 'id' as a query parameter." },
+      { error: "Provide 'email' as a query parameter." },
       { status: 400 }
     )
   }
 
-  const query = supabase.from(TABLE).select("*")
-  const { data, error } = email
-    ? await query.eq("email", email).single()
-    : await query.eq("id", id!).single()
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select("*")
+    .eq("email", email)
+    .single()
 
   if (error) {
     const status = error.code === "PGRST116" ? 404 : 500

@@ -7,7 +7,7 @@
     },
     "servers": [
       {
-        "url": "http://localhost:3000",
+        "url": "https://crisismatch-api.vercel.app/",
         "description": "Desenvolvimento local"
       }
     ],
@@ -24,31 +24,22 @@
     "paths": {
       "/api/volunteers": {
         "get": {
-          "tags": ["Volunteers"],
-          "summary": "Buscar voluntário por e-mail ou ID",
-          "description": "Retorna um único voluntário. Forneça `email` ou `id` como query parameter.",
+          "tags": [
+            "Volunteers"
+          ],
+          "summary": "Buscar voluntário por e-mail",
+          "description": "Retorna um único voluntário a partir do seu e-mail.",
           "operationId": "getVolunteer",
           "parameters": [
             {
               "name": "email",
               "in": "query",
               "description": "E-mail do voluntário",
-              "required": false,
+              "required": true,
               "schema": {
                 "type": "string",
                 "format": "email",
                 "example": "ana@email.com"
-              }
-            },
-            {
-              "name": "id",
-              "in": "query",
-              "description": "UUID do voluntário",
-              "required": false,
-              "schema": {
-                "type": "string",
-                "format": "uuid",
-                "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
               }
             }
           ],
@@ -75,7 +66,9 @@
           }
         },
         "post": {
-          "tags": ["Volunteers"],
+          "tags": [
+            "Volunteers"
+          ],
           "summary": "Criar voluntário",
           "description": "Cadastra um novo voluntário.",
           "operationId": "createVolunteer",
@@ -89,8 +82,14 @@
                 "example": {
                   "name": "Ana Silva",
                   "email": "ana@email.com",
-                  "skills": ["React", "Node.js"],
-                  "interests": ["Educação", "Meio ambiente"],
+                  "skills": [
+                    "React",
+                    "Node.js"
+                  ],
+                  "interests": [
+                    "Educação",
+                    "Meio ambiente"
+                  ],
                   "availability": "fins de semana"
                 }
               }
@@ -121,31 +120,22 @@
       },
       "/api/organizations": {
         "get": {
-          "tags": ["Organizations"],
-          "summary": "Buscar instituição por e-mail ou ID",
-          "description": "Retorna uma única instituição. Forneça `email` ou `id` como query parameter.",
+          "tags": [
+            "Organizations"
+          ],
+          "summary": "Buscar instituição por e-mail",
+          "description": "Retorna uma única instituição a partir do seu e-mail.",
           "operationId": "getOrganization",
           "parameters": [
             {
               "name": "email",
               "in": "query",
               "description": "E-mail da instituição",
-              "required": false,
+              "required": true,
               "schema": {
                 "type": "string",
                 "format": "email",
                 "example": "contato@ong.org"
-              }
-            },
-            {
-              "name": "id",
-              "in": "query",
-              "description": "UUID da instituição",
-              "required": false,
-              "schema": {
-                "type": "string",
-                "format": "uuid",
-                "example": "f9e8d7c6-b5a4-3210-fedc-ba9876543210"
               }
             }
           ],
@@ -172,7 +162,9 @@
           }
         },
         "post": {
-          "tags": ["Organizations"],
+          "tags": [
+            "Organizations"
+          ],
           "summary": "Criar instituição",
           "description": "Cadastra uma nova instituição.",
           "operationId": "createOrganization",
@@ -239,14 +231,20 @@
               "items": {
                 "type": "string"
               },
-              "example": ["React", "Node.js"]
+              "example": [
+                "React",
+                "Node.js"
+              ]
             },
             "interests": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "example": ["Educação", "Meio ambiente"]
+              "example": [
+                "Educação",
+                "Meio ambiente"
+              ]
             },
             "availability": {
               "type": "string",
@@ -258,7 +256,14 @@
               "example": "2025-04-27T12:00:00Z"
             }
           },
-          "required": ["id", "name", "email", "skills", "interests", "availability"]
+          "required": [
+            "id",
+            "name",
+            "email",
+            "skills",
+            "interests",
+            "availability"
+          ]
         },
         "CreateVolunteerInput": {
           "type": "object",
@@ -277,21 +282,33 @@
               "items": {
                 "type": "string"
               },
-              "example": ["React", "Node.js"]
+              "example": [
+                "React",
+                "Node.js"
+              ]
             },
             "interests": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "example": ["Educação", "Meio ambiente"]
+              "example": [
+                "Educação",
+                "Meio ambiente"
+              ]
             },
             "availability": {
               "type": "string",
               "example": "fins de semana"
             }
           },
-          "required": ["name", "email", "skills", "interests", "availability"]
+          "required": [
+            "name",
+            "email",
+            "skills",
+            "interests",
+            "availability"
+          ]
         },
         "Organization": {
           "type": "object",
@@ -320,7 +337,12 @@
               "example": "2025-04-27T12:00:00Z"
             }
           },
-          "required": ["id", "name", "email", "description"]
+          "required": [
+            "id",
+            "name",
+            "email",
+            "description"
+          ]
         },
         "CreateOrganizationInput": {
           "type": "object",
@@ -339,7 +361,11 @@
               "example": "Organização dedicada à preservação ambiental e educação sustentável."
             }
           },
-          "required": ["name", "email", "description"]
+          "required": [
+            "name",
+            "email",
+            "description"
+          ]
         },
         "Error": {
           "type": "object",
@@ -348,7 +374,9 @@
               "type": "string"
             }
           },
-          "required": ["error"]
+          "required": [
+            "error"
+          ]
         }
       },
       "responses": {
@@ -360,7 +388,7 @@
                 "$ref": "#/components/schemas/Error"
               },
               "example": {
-                "error": "Provide either 'email' or 'id' as a query parameter."
+                "error": "Provide 'email' as a query parameter."
               }
             }
           }
