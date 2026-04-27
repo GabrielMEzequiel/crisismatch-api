@@ -1,0 +1,422 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+      "title": "Hackathon API",
+      "description": "API para gerenciamento de Voluntários e Instituições no Hackathon.",
+      "version": "1.0.0"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000",
+        "description": "Desenvolvimento local"
+      }
+    ],
+    "tags": [
+      {
+        "name": "Volunteers",
+        "description": "Operações relacionadas a voluntários"
+      },
+      {
+        "name": "Organizations",
+        "description": "Operações relacionadas a instituições"
+      }
+    ],
+    "paths": {
+      "/api/volunteers": {
+        "get": {
+          "tags": ["Volunteers"],
+          "summary": "Buscar voluntário por e-mail ou ID",
+          "description": "Retorna um único voluntário. Forneça `email` ou `id` como query parameter.",
+          "operationId": "getVolunteer",
+          "parameters": [
+            {
+              "name": "email",
+              "in": "query",
+              "description": "E-mail do voluntário",
+              "required": false,
+              "schema": {
+                "type": "string",
+                "format": "email",
+                "example": "ana@email.com"
+              }
+            },
+            {
+              "name": "id",
+              "in": "query",
+              "description": "UUID do voluntário",
+              "required": false,
+              "schema": {
+                "type": "string",
+                "format": "uuid",
+                "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Voluntário encontrado",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Volunteer"
+                  }
+                }
+              }
+            },
+            "400": {
+              "$ref": "#/components/responses/MissingQueryParam"
+            },
+            "404": {
+              "$ref": "#/components/responses/NotFound"
+            },
+            "500": {
+              "$ref": "#/components/responses/InternalError"
+            }
+          }
+        },
+        "post": {
+          "tags": ["Volunteers"],
+          "summary": "Criar voluntário",
+          "description": "Cadastra um novo voluntário.",
+          "operationId": "createVolunteer",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateVolunteerInput"
+                },
+                "example": {
+                  "name": "Ana Silva",
+                  "email": "ana@email.com",
+                  "skills": ["React", "Node.js"],
+                  "interests": ["Educação", "Meio ambiente"],
+                  "availability": "fins de semana"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Voluntário criado com sucesso",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Volunteer"
+                  }
+                }
+              }
+            },
+            "409": {
+              "$ref": "#/components/responses/Conflict"
+            },
+            "422": {
+              "$ref": "#/components/responses/UnprocessableEntity"
+            },
+            "500": {
+              "$ref": "#/components/responses/InternalError"
+            }
+          }
+        }
+      },
+      "/api/organizations": {
+        "get": {
+          "tags": ["Organizations"],
+          "summary": "Buscar instituição por e-mail ou ID",
+          "description": "Retorna uma única instituição. Forneça `email` ou `id` como query parameter.",
+          "operationId": "getOrganization",
+          "parameters": [
+            {
+              "name": "email",
+              "in": "query",
+              "description": "E-mail da instituição",
+              "required": false,
+              "schema": {
+                "type": "string",
+                "format": "email",
+                "example": "contato@ong.org"
+              }
+            },
+            {
+              "name": "id",
+              "in": "query",
+              "description": "UUID da instituição",
+              "required": false,
+              "schema": {
+                "type": "string",
+                "format": "uuid",
+                "example": "f9e8d7c6-b5a4-3210-fedc-ba9876543210"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Instituição encontrada",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Organization"
+                  }
+                }
+              }
+            },
+            "400": {
+              "$ref": "#/components/responses/MissingQueryParam"
+            },
+            "404": {
+              "$ref": "#/components/responses/NotFound"
+            },
+            "500": {
+              "$ref": "#/components/responses/InternalError"
+            }
+          }
+        },
+        "post": {
+          "tags": ["Organizations"],
+          "summary": "Criar instituição",
+          "description": "Cadastra uma nova instituição.",
+          "operationId": "createOrganization",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateOrganizationInput"
+                },
+                "example": {
+                  "name": "ONG Futuro Verde",
+                  "email": "contato@futuroverde.org",
+                  "description": "Organização dedicada à preservação ambiental e educação sustentável."
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Instituição criada com sucesso",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Organization"
+                  }
+                }
+              }
+            },
+            "409": {
+              "$ref": "#/components/responses/Conflict"
+            },
+            "422": {
+              "$ref": "#/components/responses/UnprocessableEntity"
+            },
+            "500": {
+              "$ref": "#/components/responses/InternalError"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Volunteer": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            },
+            "name": {
+              "type": "string",
+              "example": "Ana Silva"
+            },
+            "email": {
+              "type": "string",
+              "format": "email",
+              "example": "ana@email.com"
+            },
+            "skills": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": ["React", "Node.js"]
+            },
+            "interests": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": ["Educação", "Meio ambiente"]
+            },
+            "availability": {
+              "type": "string",
+              "example": "fins de semana"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2025-04-27T12:00:00Z"
+            }
+          },
+          "required": ["id", "name", "email", "skills", "interests", "availability"]
+        },
+        "CreateVolunteerInput": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "example": "Ana Silva"
+            },
+            "email": {
+              "type": "string",
+              "format": "email",
+              "example": "ana@email.com"
+            },
+            "skills": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": ["React", "Node.js"]
+            },
+            "interests": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "example": ["Educação", "Meio ambiente"]
+            },
+            "availability": {
+              "type": "string",
+              "example": "fins de semana"
+            }
+          },
+          "required": ["name", "email", "skills", "interests", "availability"]
+        },
+        "Organization": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "example": "f9e8d7c6-b5a4-3210-fedc-ba9876543210"
+            },
+            "name": {
+              "type": "string",
+              "example": "ONG Futuro Verde"
+            },
+            "email": {
+              "type": "string",
+              "format": "email",
+              "example": "contato@futuroverde.org"
+            },
+            "description": {
+              "type": "string",
+              "example": "Organização dedicada à preservação ambiental e educação sustentável."
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2025-04-27T12:00:00Z"
+            }
+          },
+          "required": ["id", "name", "email", "description"]
+        },
+        "CreateOrganizationInput": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "example": "ONG Futuro Verde"
+            },
+            "email": {
+              "type": "string",
+              "format": "email",
+              "example": "contato@futuroverde.org"
+            },
+            "description": {
+              "type": "string",
+              "example": "Organização dedicada à preservação ambiental e educação sustentável."
+            }
+          },
+          "required": ["name", "email", "description"]
+        },
+        "Error": {
+          "type": "object",
+          "properties": {
+            "error": {
+              "type": "string"
+            }
+          },
+          "required": ["error"]
+        }
+      },
+      "responses": {
+        "MissingQueryParam": {
+          "description": "Nenhum parâmetro de busca fornecido",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              },
+              "example": {
+                "error": "Provide either 'email' or 'id' as a query parameter."
+              }
+            }
+          }
+        },
+        "NotFound": {
+          "description": "Recurso não encontrado",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              },
+              "example": {
+                "error": "No rows found"
+              }
+            }
+          }
+        },
+        "Conflict": {
+          "description": "E-mail já cadastrado",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              },
+              "example": {
+                "error": "duplicate key value violates unique constraint"
+              }
+            }
+          }
+        },
+        "UnprocessableEntity": {
+          "description": "Campos obrigatórios ausentes",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              },
+              "example": {
+                "error": "Missing required fields: name, email, skills, interests, availability."
+              }
+            }
+          }
+        },
+        "InternalError": {
+          "description": "Erro interno do servidor",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Error"
+              },
+              "example": {
+                "error": "Internal server error"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
