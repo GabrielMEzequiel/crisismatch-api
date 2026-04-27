@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 import { UpdateActionInput } from "@/types"
 
-type RouteParams = { params: { id: string } }
+type RouteParams = { params: Promise<{ id: string }> }
 
 // GET /api/actions/[id] — getActionById
 export async function GET(_request: NextRequest, { params }: RouteParams) {
@@ -11,7 +11,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
         const cookieStore = await cookies()
         const supabase = await createClient(cookieStore)
 
-        const { id } = params
+        const { id } = await params
 
         const { data, error } = await supabase
             .from("actions")
@@ -38,7 +38,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         const cookieStore = await cookies()
         const supabase = await createClient(cookieStore)
 
-        const { id } = params
+        const { id } = await params
         const body: UpdateActionInput = await request.json()
 
         const allowedFields: (keyof UpdateActionInput)[] = [

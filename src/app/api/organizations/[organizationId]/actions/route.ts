@@ -2,7 +2,7 @@ import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/utils/supabase/server"
 
-type RouteParams = { params: { organizationId: string } }
+type RouteParams = { params: Promise<{ organizationId: string }> }
 
 // GET /api/organizations/[organizationId]/actions — getActionsByOrganization
 export async function GET(_request: NextRequest, { params }: RouteParams) {
@@ -10,7 +10,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
         const cookieStore = await cookies()
         const supabase = await createClient(cookieStore)
 
-        const { organizationId } = params
+        const { organizationId } = await params
 
         if (!organizationId) {
             return NextResponse.json(
